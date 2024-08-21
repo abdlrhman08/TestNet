@@ -1,0 +1,7 @@
+[workspace]
+resolver = "2"
+members = ["master", "node"]
+
+[workspace.dependencies]
+master = { path = "./master" }
+node = { path = "./node" }

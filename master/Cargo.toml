@@ -6,3 +6,9 @@ edition = "2021"
 [dependencies]
 axum = "0.7.5"
 tokio = { version = "1.39.3", features = ["macros", "rt-multi-thread"] }
+
+serde.workspace = true
+tonic.workspace = true
+
+[build-dependencies]
+tonic-build.workspace = true

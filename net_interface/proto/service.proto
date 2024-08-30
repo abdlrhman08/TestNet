@@ -1,0 +1,14 @@
+syntax = "proto3";
+package mainservice;
+
+service TestNet {
+    rpc pullJob (Sentinel) returns (Job);
+}
+
+message Sentinel {
+    string d = 1;
+}
+
+message Job {
+    string payload = 1;
+}

@@ -1,12 +1,15 @@
 [workspace]
 resolver = "2"
-members = ["master", "node"]
+members = ["master", "net_interface", "node"]
 
 [workspace.dependencies]
 master = { path = "./master" }
 node = { path = "./node" }
+net_interface = { path = "./net_interface" }
 
+prost = { version = "0.13" }
 serde = { version = "1.0.209", features = ["derive"] }
 tokio = { version = "1.39.3", features = ["macros", "rt-multi-thread"] }
 tonic = { version = "0.12.2" }
 tonic-build = { version = "0.12" }
+tower-http = { version = "0.5.2", features = ["fs"] }

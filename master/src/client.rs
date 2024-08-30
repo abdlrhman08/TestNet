@@ -4,8 +4,7 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
-
-use crate::queue;
+use tower_http::services::ServeDir;
 
 mod response;
 
@@ -22,11 +21,11 @@ async fn register_project(
 }
 
 pub async fn start_server() {
-    let message_queue = queue::JobQueue::new();
-
+    let static_server = ServeDir::new("dist/assets/");
     let app = Router::new()
         .route("/", get(get_root))
-        .route("/hooks/:project_name", post(register_project));
+        .route("/hooks/:project_name", post(register_project))
+        .nest_service("/assets/", static_server);
 
     println!("Starting server on port 3000");
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();

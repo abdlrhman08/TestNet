@@ -6,6 +6,8 @@ edition = "2021"
 [dependencies]
 prost.workspace = true
 tonic.workspace = true
+tokio.workspace = true
+tokio-stream.workspace = true
 
 [build-dependencies]
 tonic-build.workspace = true

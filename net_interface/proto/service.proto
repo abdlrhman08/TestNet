@@ -3,7 +3,10 @@ package mainservice;
 
 service TestNet {
     rpc pullJob (Sentinel) returns (Job);
+    rpc register(Empty) returns (stream Job);
 }
+
+message Empty {}
 
 message Sentinel {
     string d = 1;

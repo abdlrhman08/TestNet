@@ -1,5 +1,5 @@
 use net_interface::interface::test_net_client::TestNetClient;
-use net_interface::interface::Sentinel;
+use net_interface::interface::{Empty, Sentinel};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -8,6 +8,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let response = master.pull_job(request).await?;
     println!("{}", response.into_inner().payload);
+
+    let mut job_receiver = master.register(Empty {}).await?.into_inner();
+
+    while let Some(job) = job_receiver.message().await? {
+        // every time we get a job we start execution and send the logs
+        // then we wait for another
+        println!("{:?}", job);
+    }
 
     Ok(())
 }

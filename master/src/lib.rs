@@ -1,2 +1,7 @@
+use serde::{Deserialize, Serialize};
+
 pub mod client;
-pub mod queue;
+pub mod scheduler;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Trigger;

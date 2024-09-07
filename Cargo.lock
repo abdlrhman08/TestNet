@@ -565,6 +565,7 @@ name = "net_interface"
 version = "0.1.0"
 dependencies = [
  "prost",
+ "rand",
  "tokio",
  "tokio-stream",
  "tonic",

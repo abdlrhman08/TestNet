@@ -12,12 +12,8 @@ async fn get_root() -> Html<String> {
     response::html_response("index.html")
 }
 
-async fn register_project(
-    Path(project_name): Path<String>,
-    Json(payload): Json<crate::queue::Trigger>,
-) {
-    println!("Registered {}", project_name);
-    println!("Registered {:?}", payload);
+async fn register_project(Path(project_name): Path<String>, Json(payload): Json<crate::Trigger>) {
+    unimplemented!();
 }
 
 pub async fn start_server() {

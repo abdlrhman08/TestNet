@@ -4,7 +4,7 @@ use net_interface::{JobQueue, NodeMap};
 use tokio::sync::Mutex;
 
 pub struct Scheduler {
-    job_queue: Arc<Mutex<JobQueue>>,
+    pub job_queue: Arc<Mutex<JobQueue>>,
     node_data: NodeMap,
 }
 

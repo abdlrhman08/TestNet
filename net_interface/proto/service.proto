@@ -12,6 +12,7 @@ message Sentinel {
     string d = 1;
 }
 
+// for now the job will only have the repo url
 message Job {
-    string payload = 1;
+    string repo_url = 1;
 }

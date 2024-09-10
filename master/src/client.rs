@@ -30,12 +30,14 @@ async fn project_trigger(
     //TODO!: save the registered project with some of its data in a
     // key value db
     let new_job = Job {
-        repo_url: payload.repository.url,
+        project_name,
+        git_url: payload.repository.git_url,
     };
 
     let job_queue = &mut *config.job_queue.lock().await;
     job_queue.queue_job(new_job);
-    // start the scheduler
+    // I don't think its healty to start the scheduler every time
+    // we get a job
     config.notifier.notify_one();
 }
 

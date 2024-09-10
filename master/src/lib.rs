@@ -22,6 +22,7 @@ pub struct Project {
     name: String,
     full_name: String,
     url: String,
+    git_url: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

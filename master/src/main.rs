@@ -1,5 +1,13 @@
-use tokio::sync::{Mutex, Notify};
-use tokio::task;
+use clap::Parser;
+use std::sync::Arc;
+use std::{
+    collections::HashMap,
+    net::{IpAddr, Ipv4Addr, SocketAddr},
+};
+use tokio::{
+    sync::{Mutex, Notify},
+    task,
+};
 use tonic::transport::Server;
 
 use master::{
@@ -8,20 +16,29 @@ use master::{
 };
 use net_interface::interface::test_net_server;
 use net_interface::{JobQueue, NodeData, TestNetServer};
-use std::collections::HashMap;
-use std::sync::Arc;
 
-//This code is getting messy with alot of arcs, I am trying
-// my bes
+#[derive(Parser)]
+struct Args {
+    #[arg(short, long, default_value_t = 25600)]
+    port: u16,
+
+    #[arg(short, long, default_value_t = 5001)]
+    rpc_port: u16,
+}
+
+// This code is getting messy with alot of arcs, I'll probably
+// have to refactor alot after I get to a working stage
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let args = Args::parse();
+
     let node_map: HashMap<String, NodeData> = HashMap::new();
 
     let job_queue = Arc::new(Mutex::new(JobQueue::new()));
     let node_data = Arc::new(Mutex::new(node_map));
 
-    let address = "127.0.0.1:5020".parse()?;
+    let grpc_address = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), args.rpc_port);
     let scheduler = Scheduler::new(&job_queue, &node_data);
     let scheduler_notifier = Arc::new(Notify::new());
     let grpc_server = TestNetServer::new(&job_queue, &node_data);
@@ -43,9 +60,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
+    println!("Starting grpc server on port {}", args.port);
     Server::builder()
         .add_service(test_net_server::TestNetServer::new(grpc_server))
-        .serve(address)
+        .serve(grpc_address)
         .await?;
 
     Ok(())

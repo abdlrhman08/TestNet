@@ -24,6 +24,9 @@ impl Scheduler {
         //TODO!: make this circular loop and set the state of the node as busy
         for (_, node) in node_data.iter_mut() {
             if !node.busy_state {
+                // is it healthier to take the lock once even if there is the
+                // possibility that we won't use it, or take it everytime we are
+                // sure we will use it
                 let job_queue = &mut *self.job_queue.lock().await;
                 let upcoming_job = job_queue.get_upcoming();
                 if let None = upcoming_job {

@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 net_interface.workspace = true
 
+futures.workspace = true
 bollard.workspace = true
 tokio.workspace = true
 tonic.workspace = true

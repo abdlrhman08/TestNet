@@ -9,6 +9,10 @@ use bollard::{
     Docker,
 };
 
+mod configyaml;
+
+type ContainerOpts = Option<CreateContainerOptions<String>>;
+
 pub struct ContainerCache<'a> {
     docker: &'a Docker,
     container_map: HashMap<String, String>,
@@ -22,19 +26,20 @@ impl<'a> ContainerCache<'a> {
         }
     }
 
-    pub async fn get_container(&mut self, image: &str, host_config: &HostConfig) -> &str {
-        if let Some(container_id) = self.container_map.get_mut(image) {
-            return container_id.as_str();
+    pub async fn get_container(&mut self, image: &str, host_config: &HostConfig) -> String {
+        if let Some(container_id) = self.container_map.get(image) {
+            return container_id.to_string();
         }
 
         let container_config = Config {
-            image: Some("ubuntu"),
+            image: Some(image),
+            cmd: Some(vec!["tail", "-f", "/dev/null"]),
             host_config: Some(host_config.clone()),
             ..Default::default()
         };
-        let container = self
+        let mut container = self
             .docker
-            .create_container(None::<CreateContainerOptions<String>>, container_config)
+            .create_container(ContainerOpts::None, container_config.clone())
             .await;
 
         if let Err(Error::DockerResponseServerError {
@@ -49,11 +54,19 @@ impl<'a> ContainerCache<'a> {
                 };
                 let mut image_stream = self.docker.create_image(Some(image), None, None);
                 while let Some(data) = image_stream.next().await {
-                    println!("Downloading {:?}", data);
+                    let info = data.unwrap();
+                    println!("Downloading {:?}, {:?}", info.id, info.progress);
                 }
+                container = self
+                    .docker
+                    .create_container(ContainerOpts::None, container_config)
+                    .await;
             }
         }
-
-        "ubuntu"
+        // I will figure a better way later
+        let container_id = container.unwrap().id.clone();
+        self.container_map
+            .insert(image.to_owned(), container_id.clone());
+        container_id
     }
 }

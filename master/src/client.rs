@@ -41,16 +41,17 @@ async fn project_trigger(
     config.notifier.notify_one();
 }
 
-pub async fn start_server(config: ServerConfig) {
+pub async fn start_server(config: ServerConfig, port: u16) {
     let static_server = ServeDir::new("dist/assets/");
     let app = Router::new()
         .route("/", get(get_root))
         .route("/hooks/:project_name", post(project_trigger))
         .nest_service("/assets/", static_server)
         .with_state(config);
+    let addr = format!("127.0.0.1:{}", port);
 
-    println!("Starting server on port 25600");
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:25600")
+    println!("Starting server on port {}", port);
+    let listener = tokio::net::TcpListener::bind(addr)
         .await
         .unwrap();
 

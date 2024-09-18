@@ -2,14 +2,17 @@ syntax = "proto3";
 package mainservice;
 
 service TestNet {
-    rpc pullJob (Sentinel) returns (Job);
+    rpc pullJob (Empty) returns (Job);
     rpc register(Empty) returns (stream Job);
+    rpc sendLog(LogData) returns (Empty);
 }
 
 message Empty {}
 
-message Sentinel {
-    string d = 1;
+// I also should find a way to tell which command
+message LogData {
+    string job_id = 1;
+    string log = 2;
 }
 
 // for now the job will only have the repo url

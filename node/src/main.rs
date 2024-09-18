@@ -1,11 +1,12 @@
 use std::process::Command;
 
+use futures::StreamExt;
 use net_interface::interface::test_net_client::TestNetClient;
 use net_interface::interface::Empty;
 
 use bollard::{
-    container::{Config, CreateContainerOptions, StartContainerOptions},
-    exec::CreateExecOptions,
+    container::{KillContainerOptions, StartContainerOptions},
+    exec::{CreateExecOptions, StartExecResults},
     secret::HostConfig,
     Docker,
 };
@@ -14,7 +15,7 @@ use bollard::{
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut master = TestNetClient::connect("http://127.0.0.1:5001").await?;
+    let mut master = TestNetClient::connect("http://127.0.0.1:5010").await?;
     let mut job_receiver = master.register(Empty {}).await?.into_inner();
     let repos_path = "/home/tmp/repos";
 
@@ -29,12 +30,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     while let Some(job) = job_receiver.message().await? {
+        println!("Received a job");
+
         // pre-test setup
         let current_container = container_cache
-            .get_container("hello-world", &host_config)
+            .get_container("ubuntu:latest", &host_config)
             .await;
+
         docker
-            .start_container(current_container, None::<StartContainerOptions<String>>)
+            .start_container(&current_container, None::<StartContainerOptions<String>>)
             .await
             .unwrap();
 
@@ -49,14 +53,33 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         // clone_command.wait_with_output();
 
         //start test
-        let command = CreateExecOptions {
-            cmd: Some(vec!["echo", "hello"]),
+        let command_options = CreateExecOptions {
+            cmd: Some(vec!["ls", "-ll"]),
             attach_stdout: Some(true),
             ..Default::default()
         };
-        docker.create_exec(current_container, command).await;
+        let command_exec = docker
+            .create_exec(&current_container, command_options)
+            .await
+            .unwrap();
 
+        let command_result = docker
+            .start_exec(command_exec.id.as_str(), None)
+            .await
+            .unwrap();
+
+        if let StartExecResults::Attached { mut output, .. } = command_result {
+            while let Some(Ok(out)) = output.next().await {
+                println!("{} from container", out);
+            }
+        }
+
+        let exec_result = docker.inspect_exec(command_exec.id.as_str()).await.unwrap();
+        println!("last command exit code {}", exec_result.exit_code.unwrap());
         //TODO!: cleanup
+        docker
+            .kill_container(&current_container, None::<KillContainerOptions<String>>)
+            .await?;
     }
 
     Ok(())

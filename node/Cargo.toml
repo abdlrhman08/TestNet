@@ -10,3 +10,6 @@ futures.workspace = true
 bollard.workspace = true
 tokio.workspace = true
 tonic.workspace = true
+serde.workspace = true
+
+serde_yaml = { version = "0.9.34" }

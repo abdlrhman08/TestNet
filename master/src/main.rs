@@ -50,8 +50,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // start the client interface on another thread since it is not the main
     // objective
-    let _client_thread = task::spawn(async {
-        client::start_server(server_config).await;
+    let _client_thread = task::spawn(async move {
+        client::start_server(server_config, args.port).await;
     });
     let _scheduler_task = task::spawn(async move {
         loop {
@@ -60,7 +60,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
-    println!("Starting grpc server on port {}", args.port);
+    println!("Starting grpc server on port {}", args.rpc_port);
     Server::builder()
         .add_service(test_net_server::TestNetServer::new(grpc_server))
         .serve(grpc_address)

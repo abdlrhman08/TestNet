@@ -5,7 +5,7 @@ use net_interface::interface::test_net_client::TestNetClient;
 use net_interface::interface::Empty;
 
 use bollard::{
-    container::{KillContainerOptions, StartContainerOptions},
+    container::KillContainerOptions,
     exec::{CreateExecOptions, StartExecResults},
     secret::HostConfig,
     Docker,
@@ -20,7 +20,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let repos_path = "/home/tmp/repos";
 
     let docker = Docker::connect_with_defaults().expect("Failed to connect to the docker daemon, please ensure that docker is installed and running as a service");
-    let mut container_cache = node::ContainerCache::new(&docker);
+    let mut container_manager = node::ContainerManager::new(&docker);
     std::fs::create_dir_all(repos_path)?;
     std::env::set_current_dir(repos_path)?;
 
@@ -33,12 +33,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("Received a job");
 
         // pre-test setup
-        let current_container = container_cache
-            .get_container("ubuntu:latest", &host_config)
-            .await;
-
-        docker
-            .start_container(&current_container, None::<StartContainerOptions<String>>)
+        let current_container = container_manager 
+            .start_container("ubuntu:latest", &host_config)
             .await
             .unwrap();
 

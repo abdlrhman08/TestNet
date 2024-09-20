@@ -12,7 +12,8 @@ message Empty {}
 // I also should find a way to tell which command
 message LogData {
     string job_id = 1;
-    string log = 2;
+    string stage = 2;
+    string log = 3;
 }
 
 // for now the job will only have the repo url

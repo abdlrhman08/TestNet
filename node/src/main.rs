@@ -1,8 +1,9 @@
 use std::process::Command;
 
-use futures::StreamExt;
 use net_interface::interface::test_net_client::TestNetClient;
 use net_interface::interface::Empty;
+
+use node::tester::PipelineRunner;
 
 use bollard::{
     container::KillContainerOptions,
@@ -20,7 +21,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let repos_path = "/home/tmp/repos";
 
     let docker = Docker::connect_with_defaults().expect("Failed to connect to the docker daemon, please ensure that docker is installed and running as a service");
+    let tester = PipelineRunner::new(&docker);
     let mut container_manager = node::ContainerManager::new(&docker);
+    
     std::fs::create_dir_all(repos_path)?;
     std::env::set_current_dir(repos_path)?;
 
@@ -49,29 +52,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         // clone_command.wait_with_output();
 
         //start test
-        let command_options = CreateExecOptions {
-            cmd: Some(vec!["ls", "-ll"]),
-            attach_stdout: Some(true),
-            ..Default::default()
-        };
-        let command_exec = docker
-            .create_exec(&current_container, command_options)
-            .await
-            .unwrap();
+        tester.create_pipeline(&current_container).await;
 
-        let command_result = docker
-            .start_exec(command_exec.id.as_str(), None)
-            .await
-            .unwrap();
-
-        if let StartExecResults::Attached { mut output, .. } = command_result {
-            while let Some(Ok(out)) = output.next().await {
-                println!("{} from container", out);
-            }
-        }
-
-        let exec_result = docker.inspect_exec(command_exec.id.as_str()).await.unwrap();
-        println!("last command exit code {}", exec_result.exit_code.unwrap());
         //TODO!: cleanup
         docker
             .kill_container(&current_container, None::<KillContainerOptions<String>>)

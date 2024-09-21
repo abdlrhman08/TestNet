@@ -1,7 +1,9 @@
 use futures::StreamExt;
 
+use std::process::Command;
+
 use bollard::{
-    container::{Config, CreateContainerOptions},
+    container::{Config, CreateContainerOptions, StartContainerOptions},
     errors::Error,
     image::CreateImageOptions,
     secret::HostConfig,
@@ -14,20 +16,29 @@ type ContainerOpts = Option<CreateContainerOptions<String>>;
 
 pub struct ContainerManager<'a> {
     docker: &'a Docker,
+    host_config: HostConfig
 }
 
 impl<'a> ContainerManager<'a> {
-    pub fn new(docker: &'a Docker) -> Self {
+    pub fn new(docker: &'a Docker, repos_path: &str) -> Self {
+        let host_config = HostConfig {
+            binds: Some(vec![format!("{}:/tmp", repos_path)]),
+            ..Default::default()
+        };
+
         Self {
             docker,
+            host_config
         }
     }
 
-    pub async fn start_container(&mut self, image: &str, host_config: &HostConfig) -> Result<String, Error> {
+    pub async fn start_container(&mut self, image: &str) -> Result<String, Error> {
         let container_config = Config {
             image: Some(image),
+
+            // to prevent the container from stopping
             cmd: Some(vec!["tail", "-f", "/dev/null"]),
-            host_config: Some(host_config.clone()),
+            host_config: Some(self.host_config.clone()),
             ..Default::default()
         };
         let mut container = self
@@ -51,13 +62,32 @@ impl<'a> ContainerManager<'a> {
                         .docker
                         .create_container(ContainerOpts::None, container_config)
                         .await;
-                    Ok(container.unwrap().id)
+
+                    let container = container.unwrap();
+                    self.docker.start_container(&container.id, None::<StartContainerOptions<String>>).await?;
+                    Ok(container.id)
                 } else {
                     Err(Error::DockerResponseServerError {status_code, message})
                 }
             }
             Err(error) => Err(error),
-            Ok(response) => Ok(response.id),
+            Ok(response) => {
+                self.docker.start_container(&response.id, None::<StartContainerOptions<String>>).await?;
+                Ok(response.id)
+            },
         }
     }
 }
+
+pub fn clone_repo(repo: &str) {
+    let clone_command = Command::new("git")
+         .arg("clone")
+         .arg(repo)
+         .spawn()
+         .unwrap();
+
+    // save the output in a log struct
+    clone_command.wait_with_output();
+}
+
+

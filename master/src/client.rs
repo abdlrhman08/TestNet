@@ -30,8 +30,8 @@ async fn project_trigger(
     //TODO!: save the registered project with some of its data in a
     // key value db
     let new_job = Job {
-        project_name,
-        git_url: payload.repository.git_url,
+        project_name: payload.repository.name,
+        git_url: payload.repository.clone_url,
     };
 
     let job_queue = &mut *config.job_queue.lock().await;

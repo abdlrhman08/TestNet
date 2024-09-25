@@ -16,13 +16,13 @@ pub struct Commit {
     author: CommitAuthor,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Project {
-    id: i32,
-    name: String,
-    full_name: String,
-    url: String,
-    clone_url: String,
+    pub id: i32,
+    pub name: String,
+    pub full_name: String,
+    pub url: String,
+    pub clone_url: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

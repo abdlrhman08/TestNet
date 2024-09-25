@@ -11,6 +11,7 @@ use tokio::{
 use tonic::transport::Server;
 
 use master::{
+    Project,
     client::{self, ServerConfig},
     scheduler::Scheduler,
 };
@@ -42,10 +43,33 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let scheduler = Scheduler::new(&job_queue, &node_data);
     let scheduler_notifier = Arc::new(Notify::new());
     let grpc_server = TestNetServer::new(&job_queue, &node_data);
+    
+    let db = sled::open("db")?;
+
+    let mut projects: HashMap<String, Project> = match db.get("projects")? {
+        Some(bytes) => bincode::deserialize(&bytes)?,
+        None => HashMap::new(),
+    };
+    projects.insert("proj1".to_string(), Project {
+        id: 123,
+        url: "asdad".to_string(),
+        clone_url: "sdad".to_string(),
+        full_name: "sadad".to_string(),
+        name: "asdsad".to_string()
+    });
+    projects.insert("proj2".to_string(), Project {
+        id: 1223,
+        url: "asdad".to_string(),
+        clone_url: "sdad".to_string(),
+        full_name: "sadad".to_string(),
+        name: "asdsad".to_string()
+    });
+    let projects_mutex = Arc::new(Mutex::new(projects));
 
     let server_config = ServerConfig {
         job_queue: Arc::clone(&job_queue),
         notifier: Arc::clone(&scheduler_notifier),
+        projects: Arc::clone(&projects_mutex)
     };
 
     // start the client interface on another thread since it is not the main

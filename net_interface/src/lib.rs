@@ -8,7 +8,7 @@ use std::sync::Arc;
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
 
 use interface::test_net_server::TestNet;
-use interface::{Empty, Job, LogData};
+use interface::{Empty, Job, LogObject};
 use tokio::sync::mpsc::{self, Sender};
 //TODO!: explain the usage of tokio mutex
 use tokio::sync::Mutex;
@@ -84,8 +84,10 @@ impl TestNet for TestNetServer {
         Ok(Response::new(upcoming_job))
     }
 
-    async fn send_log(&self, log: Request<LogData>) -> Result<Response<Empty>, Status> {
+    async fn send_log(&self, log: Request<LogObject>) -> Result<Response<Empty>, Status> {
         //TODO!: stream the logs through web sockets
+        let log = log.into_inner();
+        println!("{:?}", log);
 
         Ok(Response::new(Empty {}))
     }

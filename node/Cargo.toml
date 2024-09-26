@@ -7,6 +7,7 @@ edition = "2021"
 net_interface.workspace = true
 
 futures.workspace = true
+bytes.workspace = true
 bollard.workspace = true
 tokio.workspace = true
 tonic.workspace = true

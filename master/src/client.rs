@@ -14,6 +14,7 @@ use tower_http::services::ServeDir;
 use crate::Project;
 
 mod response;
+mod logstream;
 
 // There is a lot of arcs !!!
 
@@ -61,6 +62,7 @@ pub async fn start_server<'a>(config: ServerConfig, port: u16) {
     let app = Router::new()
         .route("/", get(get_root))
         .route("/hooks/:project_name", post(project_trigger))
+        .route("/ws", get(logstream::handler))
         .nest_service("/assets/", static_server)
         .nest("/api", api_router)
         .with_state(config);

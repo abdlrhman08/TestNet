@@ -2,9 +2,15 @@ use std::fs::File;
 use futures::StreamExt;
 
 use net_interface::interface::Job;
+use net_interface::interface::LogObject;
+use net_interface::interface::test_net_client::TestNetClient;
+
+use tonic::Request;
+use tonic::transport::Channel;
+
 
 use bollard::exec::{CreateExecOptions, CreateExecResults, StartExecResults};
-use bollard::container::{KillContainerOptions, RemoveContainerOptions};
+use bollard::container::{KillContainerOptions, RemoveContainerOptions, LogOutput};
 use bollard::Docker;
 use serde::{Serialize, Deserialize};
 
@@ -28,16 +34,40 @@ pub struct StageWithExec {
     pub commands: Vec<CreateExecResults>,
 }
 
+pub trait Extract {
+    // for now it will return only a struct, later it will
+    // return a whole log object specifying the stream type
+    fn get_data(self) -> String;
+}
+
+impl Extract for LogOutput {
+    fn get_data(self) -> String {
+        match self {
+            LogOutput::StdOut { message } => String::from_utf8(message.to_vec()).unwrap(),
+            LogOutput::StdIn { message } => String::from_utf8(message.to_vec()).unwrap(),
+            LogOutput::StdErr { message } => String::from_utf8(message.to_vec()).unwrap(),
+            LogOutput::Console { message } => String::from_utf8(message.to_vec()).unwrap(),
+        }
+    }
+}
+
+// Later this may need a mutex instead of a mutable reference
 pub struct PipelineRunner<'a> {
     docker: &'a Docker,
+    master: &'a mut TestNetClient<Channel>,
     container_manager: ContainerManager<'a>,
     current_container: Option<String>
 }
 
 impl<'a> PipelineRunner<'a> {
-    pub fn new(docker: &'a Docker, container_manager: ContainerManager<'a>) -> Self {
+    pub fn new(
+        docker: &'a Docker,
+        master: &'a mut TestNetClient<Channel>,
+        container_manager: ContainerManager<'a>
+    ) -> Self {
         Self { 
             docker,
+            master,
             container_manager,
             current_container: None
         } 
@@ -55,6 +85,7 @@ impl<'a> PipelineRunner<'a> {
             .await?;
 
         let mut pipeline_stages = Vec::new();
+
 
         for Stage { name, commands } in pipeline_file.stages {
             let mut exec_commands = Vec::new();
@@ -100,6 +131,12 @@ impl<'a> PipelineRunner<'a> {
                     while let Some(Ok(out)) = output.next().await {
                         //TODO!: stream the output to the user
                         println!("{} from container", out);
+                        let log_obj = Request::new(LogObject {
+                            job_id: "asd".to_string(),
+                            stage: stage.name.clone(),
+                            log: out.get_data()
+                        });
+                        self.master.send_log(log_obj).await;
                     }
                 }
 

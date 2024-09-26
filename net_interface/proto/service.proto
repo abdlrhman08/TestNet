@@ -4,13 +4,13 @@ package mainservice;
 service TestNet {
     rpc pullJob (Empty) returns (Job);
     rpc register(Empty) returns (stream Job);
-    rpc sendLog(LogData) returns (Empty);
+    rpc sendLog(LogObject) returns (Empty);
 }
 
 message Empty {}
 
 // I also should find a way to tell which command
-message LogData {
+message LogObject{
     string job_id = 1;
     string stage = 2;
     string log = 3;

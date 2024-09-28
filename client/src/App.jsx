@@ -75,6 +75,7 @@ export function AddSection()
             {/* <FontAwesomeIcon icon={faTimes} style={{ color: 'red' }} /> Wrong */}
           </div>
         </div>
+        
         <div className='item'>
           <div className='info'>
             <div className='data'>
@@ -90,6 +91,7 @@ export function AddSection()
             {/* <FontAwesomeIcon icon={faTimes} style={{ color: 'red' }} /> Wrong */}
           </div>
         </div>
+        
         <div className='item'>
           <div className='info'>
             <div className='data'>
@@ -105,6 +107,7 @@ export function AddSection()
             {/* <FontAwesomeIcon icon={faTimes} style={{ color: 'red' }} /> Wrong */}
           </div>
         </div>
+        
       </div>
       <div className='add'>
         <div className='add-items'>

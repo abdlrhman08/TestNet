@@ -105,6 +105,7 @@ body{
   flex-direction: column;
   border: 2px solid #ddd;
   padding: 20px;
+  border-radius: 10px;
 }
 .add-section .container .projects .item{
   display: grid;
@@ -120,6 +121,9 @@ body{
 .add-section .container .projects .item .info .data
 {
   margin-right: 20px;
+}
+.add-section .container .projects .item .info .data p:first-child{
+  margin-bottom: 15px;
 }
 .add-section .container .projects .item .info .data p:last-child{
   color: #ddd;

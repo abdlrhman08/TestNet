@@ -21,6 +21,7 @@
             extensions = [ "rust-src" ];
           })
           nodejs_22
+          typescript-language-server
         ];
 
         PROTOC = "${pkgs.protobuf}/bin/protoc";

@@ -1,9 +1,9 @@
-import logo from './logo.svg';
 import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';  // Import the "Add" icon
 import { faRocket } from '@fortawesome/free-solid-svg-icons';
-import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { useState, useEffect } from 'react';
 
 
 function App() {
@@ -55,59 +55,38 @@ export function DashboardSection()
 
 export function AddSection()
 {
+  const [projects, setProjects] = useState({});
+
+  useEffect(() => {
+    fetch("/api/projects")
+      .then((response) => response.json())
+      .then((json) => setProjects({ ...json }))
+      .catch((e) => console.log(e));
+  }, []);
+
   return (
   <>
   <div className='add-section'>
     <div className='container'>
       <div className='projects'>
-        <div className='item'>
-          <div className='info'>
-            <div className='data'>
-              <p>Project name1</p>
-              <p>Commit id1</p>
+        {Object.keys(projects).map((key) => (
+          <div className='item'>
+            <div className='info'>
+              <div className='data'>
+                <p>{projects[key].name}</p>
+                //TODO!
+                <p>c23dsa</p>
+              </div>
+              <div className='logo'>
+                <FontAwesomeIcon icon={faRocket} size="1x" />
+              </div>
             </div>
-            <div className='logo'>
-              <FontAwesomeIcon icon={faRocket} size="1x" />
-            </div>
-          </div>
-          <div className='result'>
-            <FontAwesomeIcon icon={faCheck} style={{ color: 'green' }} />
-            {/* <FontAwesomeIcon icon={faTimes} style={{ color: 'red' }} /> Wrong */}
-          </div>
-        </div>
-        
-        <div className='item'>
-          <div className='info'>
-            <div className='data'>
-              <p>Project name2</p>
-              <p>Commit id3</p>
-            </div>
-            <div className='logo'>
-              <FontAwesomeIcon icon={faRocket} size="1x" />
+            <div className='result'>
+              <FontAwesomeIcon icon={faCheck} style={{ color: 'green' }} />
+              {/* <FontAwesomeIcon icon={faTimes} style={{ color: 'red' }} /> Wrong */}
             </div>
           </div>
-          <div className='result'>
-            <FontAwesomeIcon icon={faCheck} style={{ color: 'green' }} />
-            {/* <FontAwesomeIcon icon={faTimes} style={{ color: 'red' }} /> Wrong */}
-          </div>
-        </div>
-        
-        <div className='item'>
-          <div className='info'>
-            <div className='data'>
-              <p>Project name3</p>
-              <p>Commit id3</p>
-            </div>
-            <div className='logo'>
-              <FontAwesomeIcon icon={faRocket} size="1x" />
-            </div>
-          </div>
-          <div className='result'>
-            <FontAwesomeIcon icon={faCheck} style={{ color: 'green' }} />
-            {/* <FontAwesomeIcon icon={faTimes} style={{ color: 'red' }} /> Wrong */}
-          </div>
-        </div>
-        
+        ))}
       </div>
       <div className='add'>
         <div className='add-items'>

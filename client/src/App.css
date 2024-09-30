@@ -1,42 +1,196 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+/* start variables */
+:root {
+  --section-padding: 30px;
+  --main-color: #008080;
+  --secondary-color: #FF6F61;
+  --background-color: white;
+}
+/* end variables */
+/* #343A40 */
+
+/*start global rules*/
+*{
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+body{
+  background-color: var(--background-color);
+}
+.container{
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 768px)
+{
+  .container{
+      width: 750px;
+  }
+}
+@media (min-width: 992px)
+{
+  .container{
+      width: 970px;
+  }
+}
+@media (min-width: 1200px)
+{
+  .container{
+      width: calc(100% - 30px);
+  }
+}
+/*end global rules*/
+
+
+/*start header section*/
+.header-section{
+  padding-top: var(--section-padding);
+  padding-bottom: var(--section-padding);
+  background-color: black;
+}
+.header-section .container{
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.header-section .container .logo{
+  color: white;
+  display: flex;
+  justify-content: space-around;
+}
+/* @media (max-width:767px)
+{
+  .header-section .container .logo{
+    color: white;
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+  }
+} */
+.header-section .container .logo .fa-2x {
+  color: var(--secondary-color);
+}
+.header-section .container .logo h2{
+  margin-left: 10px;
+}
+/*end header section*/
+/*start dashboard sercton*/
+.dashboard-section{
+  padding-top: var(--section-padding);
+  padding-bottom: var(--section-padding);
+  background-color: #eee;
+}
+
+/*end dashboard sercton*/
+
+/*start add-section*/
+.add-section{
+  padding-top: var(--section-padding);
+  padding-bottom: var(--section-padding);
+  background-color: white;
+}
+.add-section .container{
+  display: grid;
+  grid-template-columns: 7fr 1fr;
+  gap: 40px;
+}
+.add-section .container .projects
+{
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #ddd;
+  padding: 20px;
+  border-radius: 10px;
+}
+.add-section .container .projects .item{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 20px;
+}
+.add-section .container .projects .item .info{
+  display: flex;
+}
+.add-section .container .projects .item .info .data
+{
+  margin-right: 20px;
+}
+.add-section .container .projects .item .info .data p:first-child{
+  margin-bottom: 15px;
+}
+.add-section .container .projects .item .info .data p:last-child{
+  color: #ddd;
+  font-size: 14px;
+}
+
+.add-section .container .add .add-items{
+  display: flex;
+  align-items: center;
+  width: 150px;
+  margin-bottom: 20px;
+}
+.add-section .container .add .add-items button{
+  margin-right: 10px;
+  border-radius: 4px;
+  padding: 5px;
+  cursor: pointer;
+  border: none;
+  color: var(--secondary-color);
+}
+.add-section .container .add .add-items button:hover{
+  border: solid 1px orange;
+}
+.add-section .container .add .add-items div{
+  color: var(--secondary-color);
+}
+
+
+/*end add-section*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*start body section */
+
+/*end body section */
+
+/*start footer section*/
+.footer-section{
+  padding-top: var(--section-padding);
+  padding-bottom: var(--section-padding);
+  background-color: var(--main-color);
+}
+.footer-section .container{
   text-align: center;
+  color: white;
 }
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+.footer-section .container .fa-2x{
+  color: var(--secondary-color);
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+.footer-section .container p{
+  display: inline;
+  margin-left: 10px;
 }
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.footer-section .container p span{
+  color: var(--secondary-color);
+  font-weight: bold;
 }
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
+/*end footer section*/

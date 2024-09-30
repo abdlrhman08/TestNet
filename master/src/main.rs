@@ -55,14 +55,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         url: "asdad".to_string(),
         clone_url: "sdad".to_string(),
         full_name: "sadad".to_string(),
-        name: "asdsad".to_string()
+        name: "frontend".to_string()
     });
     projects.insert("proj2".to_string(), Project {
         id: 1223,
         url: "asdad".to_string(),
         clone_url: "sdad".to_string(),
         full_name: "sadad".to_string(),
-        name: "asdsad".to_string()
+        name: "backend".to_string()
     });
     let projects_mutex = Arc::new(Mutex::new(projects));
 

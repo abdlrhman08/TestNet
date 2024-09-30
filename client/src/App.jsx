@@ -70,7 +70,7 @@ export function AddSection()
     <div className='container'>
       <div className='projects'>
         {Object.keys(projects).map((key) => (
-          <div className='item'>
+          <div key={key} className='item'>
             <div className='info'>
               <div className='data'>
                 <p>{projects[key].name}</p>

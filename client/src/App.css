@@ -129,6 +129,10 @@ body{
   color: #ddd;
   font-size: 14px;
 }
+.add-section .container .projects .result .show-logs{
+  margin-right: 20px;
+  cursor: pointer;
+}
 
 .add-section .container .add .add-items{
   display: flex;
@@ -155,8 +159,53 @@ body{
 /*end add-section*/
 
 
+/*start modal*/
+.modal-overlay{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+}
+.modal-overlay .modal{
+  position: relative;
+  z-index: 3;
+  background-color: white;
+  max-width: 500px;
+  padding: 50px;
+  border-radius: 10px;
+}
+.modal-overlay .modal .close-modal{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
 
+/*end modal*/
 
+/*start Logs*/
+.logs{
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  background-color: #e0f7fa;
+  /* #f0f4f8
+  #e0f7fa
+  #d1e8e4 */
+}
+.logs p{
+  margin-bottom: 10px;
+}
+/*end Logs*/
 
 
 

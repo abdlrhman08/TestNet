@@ -1033,8 +1033,11 @@ checksum = "defc4c55412d89136f966bbb339008b474350e5e6e78d2714439c386b3137a03"
 name = "net_interface"
 version = "0.1.0"
 dependencies = [
+ "axum",
  "prost",
  "rand",
+ "serde",
+ "serde_json",
  "tokio",
  "tokio-stream",
  "tonic",

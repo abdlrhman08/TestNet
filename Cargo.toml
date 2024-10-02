@@ -7,6 +7,7 @@ master = { path = "./master" }
 node = { path = "./node" }
 net_interface = { path = "./net_interface" }
 
+axum = { version = "0.7.5", features = ["ws"] }
 bollard = { version = "=0.17.1" }
 bincode = { version = "1.3.3" }
 bytes = { version = "1.7.2" }

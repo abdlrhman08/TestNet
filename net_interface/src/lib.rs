@@ -3,17 +3,34 @@ pub mod interface {
 }
 
 use std::collections::{HashMap, VecDeque};
-use std::sync::Arc;
+use std::sync::{Arc, LazyLock};
 
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
 
+use axum::extract::ws::{Message, WebSocket};
+
+use serde::Serialize;
+
 use interface::test_net_server::TestNet;
-use interface::{Empty, Job, LogObject};
+use interface::{
+    Empty, Job, LogObject, Stages
+};
+
 use tokio::sync::mpsc::{self, Sender};
 //TODO!: explain the usage of tokio mutex
 use tokio::sync::Mutex;
 use tokio_stream::wrappers::ReceiverStream;
 use tonic::{Request, Response, Status};
+
+// I hate what i am gonna do
+pub static LOG_STREAMER: LazyLock<Mutex<Option<WebSocket>>> = LazyLock::new(|| { Mutex::new(None) });
+
+#[derive(Serialize)]
+struct SerializableLog {
+    project: i32,
+    stage: String,
+    log: String,
+}
 
 fn generate_random_id() -> String {
     thread_rng()
@@ -84,10 +101,25 @@ impl TestNet for TestNetServer {
         Ok(Response::new(upcoming_job))
     }
 
+    async fn register_stages(&self, stages: Request<Stages>) -> Result<Response<Empty>, Status> {
+        println!("Resolved stages {:?}", stages);
+        Ok(Response::new(Empty {}))
+    }
+
     async fn send_log(&self, log: Request<LogObject>) -> Result<Response<Empty>, Status> {
         //TODO!: stream the logs through web sockets
-        let log = log.into_inner();
-        println!("{:?}", log);
+        let LogObject { job_id, stage, log } = log.into_inner();
+        let log = SerializableLog { 
+            project: 123, 
+            stage, log
+        };
+        let json_log = serde_json::to_string(&log).unwrap();
+
+        if let Some(ws) = &mut *LOG_STREAMER.lock().await {
+            let sock = ws.send(Message::Text(json_log)).await;
+        } else {
+            todo!();
+        }
 
         Ok(Response::new(Empty {}))
     }

@@ -5,15 +5,20 @@ service TestNet {
     rpc pullJob (Empty) returns (Job);
     rpc register(Empty) returns (stream Job);
     rpc sendLog(LogObject) returns (Empty);
+    rpc registerStages(Stages) returns (Empty);
 }
 
 message Empty {}
 
 // I also should find a way to tell which command
-message LogObject{
+message LogObject {
     string job_id = 1;
     string stage = 2;
     string log = 3;
+}
+
+message Stages {
+    repeated string stages = 1;
 }
 
 // for now the job will only have the repo url

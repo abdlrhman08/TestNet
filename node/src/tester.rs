@@ -3,6 +3,7 @@ use futures::StreamExt;
 
 use net_interface::interface::Job;
 use net_interface::interface::LogObject;
+use net_interface::interface::Stages;
 use net_interface::interface::test_net_client::TestNetClient;
 
 use tonic::Request;
@@ -85,7 +86,7 @@ impl<'a> PipelineRunner<'a> {
             .await?;
 
         let mut pipeline_stages = Vec::new();
-
+        let mut stage_names = Vec::new();
 
         for Stage { name, commands } in pipeline_file.stages {
             let mut exec_commands = Vec::new();
@@ -105,12 +106,17 @@ impl<'a> PipelineRunner<'a> {
 
                 exec_commands.push(created_exec);
             }
+            stage_names.push(name.clone());
             pipeline_stages.push(StageWithExec {
                 name,
                 commands: exec_commands
             });
         }
-        
+
+        let request = tonic::Request::new(Stages {
+            stages: stage_names
+        });
+        self.master.register_stages(request).await;
         self.current_container = Some(container);
         Ok(pipeline_stages)
     }

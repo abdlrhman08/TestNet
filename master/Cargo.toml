@@ -4,10 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-axum = { version = "0.7.5", features = [ "ws" ] }
-
 net_interface.workspace = true
 
+axum.workspace = true 
 bincode.workspace = true
 clap.workspace = true
 sled.workspace = true

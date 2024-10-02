@@ -23,6 +23,9 @@ pub struct Project {
     pub full_name: String,
     pub url: String,
     pub clone_url: String,
+
+    #[serde(skip_deserializing)]
+    pub stages: Option<Vec<String>>
 }
 
 #[derive(Debug, Serialize, Deserialize)]

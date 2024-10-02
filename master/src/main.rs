@@ -38,33 +38,34 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let job_queue = Arc::new(Mutex::new(JobQueue::new()));
     let node_data = Arc::new(Mutex::new(node_map));
+    
+    let db = sled::open("db")?;
+    let mut projects: HashMap<String, Project> = match db.get("projects")? {
+        Some(bytes) => bincode::deserialize(&bytes)?,
+        None => HashMap::new(),
+    };
+    let projects_mutex = Arc::new(Mutex::new(projects));
 
     let grpc_address = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), args.rpc_port);
     let scheduler = Scheduler::new(&job_queue, &node_data);
     let scheduler_notifier = Arc::new(Notify::new());
     let grpc_server = TestNetServer::new(&job_queue, &node_data);
     
-    let db = sled::open("db")?;
 
-    let mut projects: HashMap<String, Project> = match db.get("projects")? {
-        Some(bytes) => bincode::deserialize(&bytes)?,
-        None => HashMap::new(),
-    };
-    projects.insert("proj1".to_string(), Project {
-        id: 123,
-        url: "asdad".to_string(),
-        clone_url: "sdad".to_string(),
-        full_name: "sadad".to_string(),
-        name: "frontend".to_string()
-    });
-    projects.insert("proj2".to_string(), Project {
-        id: 1223,
-        url: "asdad".to_string(),
-        clone_url: "sdad".to_string(),
-        full_name: "sadad".to_string(),
-        name: "backend".to_string()
-    });
-    let projects_mutex = Arc::new(Mutex::new(projects));
+   // projects.insert("proj1".to_string(), Project {
+   //     id: 123,
+   //     url: "asdad".to_string(),
+   //     clone_url: "sdad".to_string(),
+   //     full_name: "sadad".to_string(),
+   //     name: "frontend".to_string()
+   // });
+   // projects.insert("proj2".to_string(), Project {
+   //     id: 1223,
+   //     url: "asdad".to_string(),
+   //     clone_url: "sdad".to_string(),
+   //     full_name: "sadad".to_string(),
+   //     name: "backend".to_string()
+   // });
 
     let server_config = ServerConfig {
         job_queue: Arc::clone(&job_queue),

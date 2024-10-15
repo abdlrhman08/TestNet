@@ -110,7 +110,7 @@ impl TestNet for TestNetServer {
         //TODO!: stream the logs through web sockets
         let LogObject { job_id, stage, log } = log.into_inner();
         let log = SerializableLog { 
-            project: 123, 
+            project: 122, 
             stage, log
         };
         let json_log = serde_json::to_string(&log).unwrap();

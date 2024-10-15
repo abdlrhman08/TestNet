@@ -3,20 +3,20 @@ use serde::{Deserialize, Serialize};
 pub mod client;
 pub mod scheduler;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct CommitAuthor {
     name: String,
     username: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Commit {
     id: String,
     message: String,
     author: CommitAuthor,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct Project {
     pub id: i32,
     pub name: String,
@@ -28,11 +28,15 @@ pub struct Project {
     pub stages: Option<Vec<String>>
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Trigger {
+    #[serde(default)]
     #[serde(rename = "ref")]
     pub branch: String,
 
+    #[serde(default)]
     pub head_commit: Commit,
+
+    #[serde(default)]
     pub repository: Project,
 }

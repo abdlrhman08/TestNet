@@ -7,6 +7,9 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { useState, useEffect } from 'react';
 
+import useWebSocket from 'react-use-websocket';
+
+const ws_url = "ws://".concat(window.location.host, "/ws")
 
 function App() {
   return (
@@ -52,16 +55,55 @@ export function DashboardSection()
 export function AddSection()
 {
   const [projects, setProjects] = useState({});
+  const [stageMap, setStages] = useState({});
   const [isOpenedModal, setIsOpenedModal] = useState(false);
   const [isOpenedLogs, setIsOpenedLogs] = useState([]);
+
+  const { lastMessage } = useWebSocket(ws_url, {
+    share: true
+  });
+
   useEffect(() => {
     fetch("/api/projects")
       .then((response) => response.json())
-      .then((json) => 
-        {setProjects({ ...json });
-         setIsOpenedLogs(Array(json.projects.length).fill(false));})
+      .then((json) => {
+          setProjects({ ...json });
+
+         //setIsOpenedLogs(Array(json.projects.length).fill(false));
+      })
       .catch((e) => console.log(e));
   }, []);
+
+  useEffect(() => {
+    if (!(lastMessage instanceof Object)) { return }
+
+    const message = JSON.parse(lastMessage.data);
+    if (message.notification) {
+
+      return;
+    }
+    const { project, stage, log } = message;
+
+    // probably the most in efficient way to do it, but hey
+    // who cares :P
+    if (stageMap[project] && stage in stageMap[project]) {
+      setStages({
+        ...stageMap,
+        [project]: {
+          ...stageMap[project],
+          [stage]: stageMap[project][stage].concat(log)
+        }
+      });
+    } else {
+      setStages({
+        ...stageMap,
+        [project]: {
+          ...stageMap[project],
+          [stage]: log
+        }
+      });
+    }
+  }, [lastMessage])
 
   function handleLogs(index)
   {
@@ -94,7 +136,7 @@ export function AddSection()
               <FontAwesomeIcon icon={faCheck} style={{ color: 'green' }} />
               {/* <FontAwesomeIcon icon={faTimes} style={{ color: 'red' }} /> Wrong */}
             </div>
-            {isOpenedLogs[index] && <Logs />}
+            {isOpenedLogs[index] && <Logs stageMap={stageMap} project={key}/>}
           </div>
         ))}
       </div>
@@ -138,16 +180,22 @@ export function Modal({isOpen , close})
   </div>
   </>);
 }
-export function Logs()
+export function Logs({ stageMap, project })
 {
+  const logs = [];
+
+  for (const key in stageMap[project]) {
+    logs.push(
+    <div>
+      <h3>{key}</h3>
+      <p style={{whiteSpace: "pre-wrap"}}>{stageMap[project][key]}</p>
+    </div>);
+  }
   return (
   <>
-  <div className='logs'>
-    <p>Log1</p>
-    <p>Log2</p>
-    <p>Log3</p>
-    <p>Log4</p>
-  </div>
+    <div>
+      {logs}
+    </div>
   </>);
 }
 

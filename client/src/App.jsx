@@ -1,6 +1,6 @@
 import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';  // Import the "Add" icon
+import { faPlus, faSpinner } from '@fortawesome/free-solid-svg-icons';  // Import the "Add" icon
 import { faRocket } from '@fortawesome/free-solid-svg-icons';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -95,6 +95,13 @@ export function AddSection()
         }
       });
     } else {
+      // We can merge these two states, no need to have them seperate
+      setProjects({...projects,
+        [project]: {
+          ...projects[project],
+          status: "running"
+        }
+      })
       setStages({
         ...stageMap,
         [project]: {
@@ -111,6 +118,15 @@ export function AddSection()
     next_isOpenedLogs[index] = !next_isOpenedLogs[index];
     setIsOpenedLogs(next_isOpenedLogs);
   }
+
+  function statusIcon(status) {
+    if (status === "running") {
+      return <FontAwesomeIcon icon={faSpinner} style={{ color: 'orange' }} />
+    } else if (status === "finished") {
+      return <FontAwesomeIcon icon={faCheck} style={{ color: 'green' }} />
+    }
+  }
+
   return (
   <>
   <div className='add-section'>
@@ -133,8 +149,7 @@ export function AddSection()
               <button className='show-logs' onClick={() =>{handleLogs(index);}}>
                 {isOpenedLogs[index]? (<FontAwesomeIcon icon={faChevronUp} />) : (<FontAwesomeIcon icon={faChevronDown} />)}  
               </button>
-              <FontAwesomeIcon icon={faCheck} style={{ color: 'green' }} />
-              {/* <FontAwesomeIcon icon={faTimes} style={{ color: 'red' }} /> Wrong */}
+              {statusIcon(projects[project].status)}
             </div>
             {isOpenedLogs[index] && <Logs stageMap={stageMap} project={key}/>}
           </div>

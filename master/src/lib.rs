@@ -40,3 +40,10 @@ pub struct Trigger {
     #[serde(default)]
     pub repository: Project,
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct Notification {
+    // just added so the front-end can distinguish from normal data
+    pub notification: bool,
+    pub data: String
+}

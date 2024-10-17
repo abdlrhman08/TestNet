@@ -125,6 +125,7 @@ impl<'a> PipelineRunner<'a> {
     pub async fn run_pipeline(&mut self, job: Job) {
         let pipeline_stages = self.create_pipeline(job).await.unwrap();
         
+        let mut last_exec_status = 0;
         for stage in pipeline_stages.iter() {
             for command in stage.commands.iter() {
                 let start_exec = self.docker
@@ -140,16 +141,32 @@ impl<'a> PipelineRunner<'a> {
                         let log_obj = Request::new(LogObject {
                             job_id: "asd".to_string(),
                             stage: stage.name.clone(),
-                            log: out.get_data()
+                            log: out.get_data(),
+                            status_code: None,
                         });
                         self.master.send_log(log_obj).await;
                     }
                 }
 
-                let exec_result = self.docker.inspect_exec(&command.id).await.unwrap();
-                println!("last command exit code {}", exec_result.exit_code.unwrap());
+                let exec_result = self.docker.inspect_exec(&command.id).await.unwrap(); 
+                last_exec_status = exec_result.exit_code.unwrap() as i32;
+                let log_obj = Request::new(LogObject {
+                    job_id: "asd".to_string(),
+                    stage: stage.name.clone(),
+                    log: "".to_string(),
+                    status_code: Some(exec_result.exit_code.unwrap() as i32)
+                });
+                self.master.send_log(log_obj).await;
             }
+
         }
+        let log_obj = Request::new(LogObject {
+            job_id: "asd".to_string(),
+            stage: "EXIT_WITH_STATUS".to_string(),
+            log: "".to_string(),
+            status_code: Some(last_exec_status)
+        });
+        self.master.send_log(log_obj).await;
     }
 
     pub async fn clean(&mut self) -> Result<(), &str>{

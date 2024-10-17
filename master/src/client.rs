@@ -2,9 +2,8 @@ use std::sync::Arc;
 use std::collections::HashMap;
 
 use axum::{
-    extract::{Path, State},
+    extract::{Path, State, ws::Message},
     http::HeaderMap,
-    http::header::HeaderValue,
     response::Html,
     routing::{get, post},
     Json, Router,
@@ -13,7 +12,7 @@ use net_interface::{interface::Job, JobQueue};
 use tokio::sync::{Mutex, Notify};
 use tower_http::services::ServeDir;
 
-use crate::Project;
+use crate::{Project, Notification};
 
 mod response;
 mod logstream;
@@ -55,8 +54,18 @@ async fn project_trigger(
                     clone_url: payload.repository.clone_url,
                     stages: None
                 };
+                let notification = Notification {
+                    notification: true,
+                    data: serde_json::to_string(&new_project).unwrap()
+                };
+
                 let project_map = &mut config.projects.lock().await;
                 project_map.insert(122, new_project);
+                drop(project_map);
+                
+                if let Some(ws) = &mut *net_interface::LOG_STREAMER.lock().await {
+                    ws.send(Message::Text(serde_json::to_string(&notification).unwrap())).await;
+                }
             },
             Ok(other) => {
                 let new_job = Job {

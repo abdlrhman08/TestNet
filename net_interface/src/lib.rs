@@ -30,6 +30,7 @@ struct SerializableLog {
     project: i32,
     stage: String,
     log: String,
+    exit_code: Option<u8>,
 }
 
 fn generate_random_id() -> String {
@@ -108,10 +109,11 @@ impl TestNet for TestNetServer {
 
     async fn send_log(&self, log: Request<LogObject>) -> Result<Response<Empty>, Status> {
         //TODO!: stream the logs through web sockets
-        let LogObject { job_id, stage, log } = log.into_inner();
+        let LogObject { job_id, stage, log, status_code } = log.into_inner();
         let log = SerializableLog { 
             project: 122, 
-            stage, log
+            stage, log,
+            exit_code: Some(status_code.unwrap() as u8)
         };
         let json_log = serde_json::to_string(&log).unwrap();
 

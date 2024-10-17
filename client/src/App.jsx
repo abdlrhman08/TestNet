@@ -79,10 +79,14 @@ export function AddSection()
 
     const message = JSON.parse(lastMessage.data);
     if (message.notification) {
-
+      const project = JSON.parse(message.data);
+      setProjects({
+        ...projects,
+        [project.id]: project
+      });
       return;
     }
-    const { project, stage, log } = message;
+    const { project, stage, log, status_code } = message;
 
     // probably the most in efficient way to do it, but hey
     // who cares :P
@@ -91,7 +95,7 @@ export function AddSection()
         ...stageMap,
         [project]: {
           ...stageMap[project],
-          [stage]: stageMap[project][stage].concat(log)
+          [stage]: stageMap[project][stage].concat(log),
         }
       });
     } else {
@@ -149,7 +153,7 @@ export function AddSection()
               <button className='show-logs' onClick={() =>{handleLogs(index);}}>
                 {isOpenedLogs[index]? (<FontAwesomeIcon icon={faChevronUp} />) : (<FontAwesomeIcon icon={faChevronDown} />)}  
               </button>
-              {statusIcon(projects[project].status)}
+              {statusIcon(projects[key].status)}
             </div>
             {isOpenedLogs[index] && <Logs stageMap={stageMap} project={key}/>}
           </div>

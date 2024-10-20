@@ -123,6 +123,8 @@ body{
   margin-right: 20px;
 }
 .add-section .container .projects .item .info .data p:first-child{
+  font-weight: bold;
+  font-size: 22px;
   margin-bottom: 15px;
 }
 .add-section .container .projects .item .info .data p:last-child{
@@ -207,49 +209,17 @@ body{
 }
 /*end Logs*/
 
-
-
-
-
-
-
-
-
-/*start body section */
-
-/*end body section */
-
-/*start footer section*/
-.footer-section{
-  padding-top: var(--section-padding);
-  padding-bottom: var(--section-padding);
-  background-color: var(--main-color);
+.add-section .container .projects .item .stages h3{
+  background-color: #ddd;
+  padding-left: 20px;
+  color: black;
+  padding-top: 5px;
+  padding-bottom: 10px;
+  border-radius: 4px;
 }
-.footer-section .container{
-  text-align: center;
-  color: white;
+.add-section .container .projects .item .stages p{
+  background-color: #2b2b2b;
+  padding-left: 20px;
+  color: #bdbdbd;
 }
-.footer-section .container .fa-2x{
-  color: var(--secondary-color);
-}
-.footer-section .container p{
-  display: inline;
-  margin-left: 10px;
-}
-.footer-section .container p span{
-  color: var(--secondary-color);
-  font-weight: bold;
-}
-/*end footer section*/
 
-
-
-/* web socket with react , and use dummy server
-
-
-first apply on this data
-{"project":123,"stage":"formatting","log":"hello\n"}
-{"project":123,"stage":"formatting","log":"total 48\n-rw-r--r-- 1 root root  113 Sep 21 21:08 README.md\n-rw-r--r-- 1 root root  170 Sep 21 21:08 TestNet.yaml\ndrwxr-xr-x 3 root root 4096 Sep 21 21:08 authentication\n-rwxr-xr-x 1 root root  221 Sep 21 21:08 build.sh\ndrwxr-xr-x 3 root root 4096 Sep 21 21:08 distributed_project\n-rwxr-xr-x 1 root root  675 Sep 21 21:08 manage.py\ndrwxr-xr-x 3 root root 4096 Sep 21 21:08 paymentservice\n-rw-r--r-- 1 root root  598 Sep 21 21:08 render.yaml\n-rw-r--r-- 1 root root  841 Sep 21 21:08 requirements.txt\n-rw-r--r-- 1 root root  237 Sep 21 21:08 ruff.toml\ndrwxr-xr-x 3 root root 4096 Sep 21 21:08 stats\ndrwxr-xr-x 3 root root 4096 Sep 21 21:08 store\n"}
-stage_name
-logs
-*/

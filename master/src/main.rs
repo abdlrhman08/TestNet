@@ -40,7 +40,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let node_data = Arc::new(Mutex::new(node_map));
     
     let db = sled::open("db")?;
-    let mut projects: HashMap<u64, Project> = match db.get("projects")? {
+    let projects: HashMap<u64, Project> = match db.get("projects")? {
         Some(bytes) => bincode::deserialize(&bytes)?,
         None => HashMap::new(),
     };

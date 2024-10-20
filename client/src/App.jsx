@@ -86,7 +86,27 @@ export function AddSection()
       });
       return;
     }
-    const { project, stage, log, status_code } = message;
+    const { project, stage, log, exit_code } = message;
+
+    if (stage === "EXIT_WITH_STATUS") {
+      if (exit_code === 0) {
+        setProjects({...projects,
+          [project]: {
+            ...projects[project],
+            status: "success"
+          }
+        })
+      } else {
+        setProjects({...projects,
+          [project]: {
+            ...projects[project],
+            status: "failed"
+          }
+        })
+      }
+
+      return;
+    }
 
     // probably the most in efficient way to do it, but hey
     // who cares :P
@@ -126,7 +146,7 @@ export function AddSection()
   function statusIcon(status) {
     if (status === "running") {
       return <FontAwesomeIcon icon={faSpinner} style={{ color: 'orange' }} />
-    } else if (status === "finished") {
+    } else if (status === "success") {
       return <FontAwesomeIcon icon={faCheck} style={{ color: 'green' }} />
     }
   }
@@ -166,12 +186,6 @@ export function AddSection()
           </button>
           <div>add projects</div>
         </div>
-        <div className='add-items'>
-          <button>
-            <FontAwesomeIcon icon={faPlus} />
-          </button>
-          <div>add nodes</div>
-        </div>
       </div>
     </div>
   </div>
@@ -192,8 +206,8 @@ export function Modal({isOpen , close})
       <button className='close-modal' onClick={close}>
         <FontAwesomeIcon icon={faTimes} />
       </button>
-      <p className='text'>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus ipsam suscipit recusandae adipisci fugit laborum repudiandae, temporibus illo eligendi iure officia quibusdam laudantium at ratione libero est corrupti veniam ab.
+      <p  className='text'>
+        To add a project,<br></br> add {window.location.href}hooks/"project-name-you-want" to your repositories webhooks
       </p>
     </div>
   </div>
@@ -212,7 +226,7 @@ export function Logs({ stageMap, project })
   }
   return (
   <>
-    <div>
+    <div className="stages">
       {logs}
     </div>
   </>);

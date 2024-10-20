@@ -30,7 +30,9 @@ struct SerializableLog {
     project: i32,
     stage: String,
     log: String,
-    exit_code: Option<u8>,
+
+    // is preferred to mke this a u8, but for simplicity we'll leave it as i32
+    exit_code: Option<i32>,
 }
 
 fn generate_random_id() -> String {
@@ -113,12 +115,12 @@ impl TestNet for TestNetServer {
         let log = SerializableLog { 
             project: 122, 
             stage, log,
-            exit_code: Some(status_code.unwrap() as u8)
+            exit_code: status_code
         };
         let json_log = serde_json::to_string(&log).unwrap();
 
         if let Some(ws) = &mut *LOG_STREAMER.lock().await {
-            let sock = ws.send(Message::Text(json_log)).await;
+            let _sock = ws.send(Message::Text(json_log)).await;
         } else {
             todo!();
         }

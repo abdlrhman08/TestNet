@@ -12,7 +12,7 @@ message Empty {}
 
 // I also should find a way to tell which command
 message LogObject {
-    string job_id = 1;
+    uint64 job_id = 1;
     string stage = 2;
     string log = 3;
     optional int32 status_code = 4;
@@ -24,6 +24,7 @@ message Stages {
 
 // for now the job will only have the repo url
 message Job {
-    string project_name = 1;
-    string git_url = 2;
+    uint64 project_id = 1;
+    string project_name = 2;
+    string git_url = 3;
 }

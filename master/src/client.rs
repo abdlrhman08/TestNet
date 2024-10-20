@@ -47,7 +47,7 @@ async fn project_trigger(
         match request_type.to_str() {
             Ok("ping") => {
                 let new_project = Project {
-                    id: 122, // this better be the initial hook id
+                    id: payload.hook_id, // this better be the initial hook id
                     name: project_name,
                     full_name: payload.repository.full_name,
                     url: payload.repository.url,
@@ -60,7 +60,7 @@ async fn project_trigger(
                 };
 
                 let project_map = &mut config.projects.lock().await;
-                project_map.insert(122, new_project);
+                project_map.insert(payload.hook_id, new_project);
                 drop(project_map);
                 
                 if let Some(ws) = &mut *net_interface::LOG_STREAMER.lock().await {
@@ -68,7 +68,17 @@ async fn project_trigger(
                 }
             },
             Ok(other) => {
+                let project_id = config.projects.lock().await.iter()
+                    .reduce(|acc, curr| {
+                        if curr.1.full_name == payload.repository.full_name {
+                            curr
+                        } else {
+                            acc
+                        }
+                    }).unwrap().0.clone();
+
                 let new_job = Job {
+                    project_id,
                     project_name: payload.repository.name,
                     git_url: payload.repository.clone_url,
                 };

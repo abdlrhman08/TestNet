@@ -27,7 +27,7 @@ pub static LOG_STREAMER: LazyLock<Mutex<Option<WebSocket>>> = LazyLock::new(|| {
 
 #[derive(Serialize)]
 struct SerializableLog {
-    project: i32,
+    project: u64,
     stage: String,
     log: String,
 
@@ -113,7 +113,7 @@ impl TestNet for TestNetServer {
         //TODO!: stream the logs through web sockets
         let LogObject { job_id, stage, log, status_code } = log.into_inner();
         let log = SerializableLog { 
-            project: 122, 
+            project: job_id, 
             stage, log,
             exit_code: status_code
         };

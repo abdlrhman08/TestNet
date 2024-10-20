@@ -18,7 +18,7 @@ pub struct Commit {
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct Project {
-    pub id: i32,
+    pub id: u64,
     pub name: String,
     pub full_name: String,
     pub url: String,
@@ -36,6 +36,9 @@ pub struct Trigger {
 
     #[serde(default)]
     pub head_commit: Commit,
+
+    #[serde(default)]
+    pub hook_id: u64,
 
     #[serde(default)]
     pub repository: Project,

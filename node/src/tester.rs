@@ -123,6 +123,7 @@ impl<'a> PipelineRunner<'a> {
 
     //It is better to move the host config as a struct variable
     pub async fn run_pipeline(&mut self, job: Job) {
+        let project_id = job.project_id;
         let pipeline_stages = self.create_pipeline(job).await.unwrap();
         
         let mut last_exec_status = 0;
@@ -139,7 +140,8 @@ impl<'a> PipelineRunner<'a> {
                         //TODO!: stream the output to the user
                         println!("{} from container", out);
                         let log_obj = Request::new(LogObject {
-                            job_id: "asd".to_string(),
+                            // for now we will set the job id as the project id
+                            job_id: project_id,
                             stage: stage.name.clone(),
                             log: out.get_data(),
                             status_code: None,
@@ -151,7 +153,7 @@ impl<'a> PipelineRunner<'a> {
                 let exec_result = self.docker.inspect_exec(&command.id).await.unwrap(); 
                 last_exec_status = exec_result.exit_code.unwrap() as i32;
                 let log_obj = Request::new(LogObject {
-                    job_id: "asd".to_string(),
+                    job_id: project_id,
                     stage: stage.name.clone(),
                     log: "".to_string(),
                     status_code: Some(exec_result.exit_code.unwrap() as i32)
@@ -161,7 +163,7 @@ impl<'a> PipelineRunner<'a> {
 
         }
         let log_obj = Request::new(LogObject {
-            job_id: "asd".to_string(),
+            job_id: project_id,
             stage: "EXIT_WITH_STATUS".to_string(),
             log: "".to_string(),
             status_code: Some(last_exec_status)

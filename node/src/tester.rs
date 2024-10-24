@@ -76,7 +76,6 @@ impl<'a> PipelineRunner<'a> {
 
     // The reference here for docker maybe changed for a global variable
     pub async fn create_pipeline(&mut self, job: Job) -> Result<Vec<StageWithExec>, Box<dyn std::error::Error>> {
-        println!("{}", job.project_name);
         let yaml_file = File::open(format!("./{}/TestNet.yaml", &job.project_name))?;
         let pipeline_file: Pipeline = serde_yaml::from_reader(yaml_file)?;
         let working_dir = format!("/tmp/{}", &job.project_name);
@@ -91,11 +90,14 @@ impl<'a> PipelineRunner<'a> {
         for Stage { name, commands } in pipeline_file.stages {
             let mut exec_commands = Vec::new();
             for command in commands {
-                let splitted_command: Vec<String> = command.split_whitespace().map(|cmd| cmd.to_owned()).collect();
                 let exec_option = CreateExecOptions {
                     working_dir: Some(working_dir.clone()),
-                    cmd: Some(splitted_command),
+
+                    // for python inconsistencies
+                    env: Some(vec!["PYTHONUNBUFFERED=1".to_owned()]),
+                    cmd: Some(vec!["sh".to_owned(), "-c".to_owned(), command]),
                     attach_stdout: Some(true),
+                    tty: Some(true),
                     ..Default::default()
                 };
 
@@ -125,7 +127,8 @@ impl<'a> PipelineRunner<'a> {
     pub async fn run_pipeline(&mut self, job: Job) {
         let project_id = job.project_id;
         let pipeline_stages = self.create_pipeline(job).await.unwrap();
-        
+
+        let mut pipeline_failed = false;
         let mut last_exec_status = 0;
         for stage in pipeline_stages.iter() {
             for command in stage.commands.iter() {
@@ -159,7 +162,13 @@ impl<'a> PipelineRunner<'a> {
                     status_code: Some(exec_result.exit_code.unwrap() as i32)
                 });
                 self.master.send_log(log_obj).await;
+
+                if last_exec_status != 0 {
+                    pipeline_failed = true;
+                    break;
+                }
             }
+            if pipeline_failed { break; }
 
         }
         let log_obj = Request::new(LogObject {

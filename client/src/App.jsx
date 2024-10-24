@@ -1,9 +1,10 @@
 import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSpinner } from '@fortawesome/free-solid-svg-icons';  // Import the "Add" icon
+import { faCross, faPlus, faSpinner, faXmark } from '@fortawesome/free-solid-svg-icons';  // Import the "Add" icon
 import { faRocket } from '@fortawesome/free-solid-svg-icons';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { useState, useEffect } from 'react';
 
@@ -148,6 +149,8 @@ export function AddSection()
       return <FontAwesomeIcon icon={faSpinner} style={{ color: 'orange' }} />
     } else if (status === "success") {
       return <FontAwesomeIcon icon={faCheck} style={{ color: 'green' }} />
+    } else if (status === "failed"){
+      return <FontAwesomeIcon icon={faXmark} style={{ color: 'red' }} />
     }
   }
 
@@ -166,7 +169,9 @@ export function AddSection()
                 <p>c23dsa</p>
               </div>
               <div className='logo'>
-                <FontAwesomeIcon icon={faRocket} size="1x" />
+                <a href={projects[key].clone_url} target="_blank" rel="noopener noreferrer">
+                  <FontAwesomeIcon icon={faGithub} size="2x" />
+                </a>
               </div>
             </div>
             <div className='result'>
@@ -230,22 +235,6 @@ export function Logs({ stageMap, project })
       {logs}
     </div>
   </>);
-}
-
-
-
-export function FooterSection()
-{
-  return (
-  <>
-    <div className="footer-section">
-      <div className="container">
-        <FontAwesomeIcon icon={faRocket} size="2x" />
-        <p class="copyright">&copy; 2024<span>Test net</span> All Right Reserved</p>       
-      </div>
-    </div>
-  </>
-);
 }
 
 export default App;

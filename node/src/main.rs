@@ -25,6 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("Received a job");
         println!("Received: {}", job.git_url);
         println!("Cloning");
+        let project_name = job.project_name.clone();
         
         // pretest
         node::clone_repo(&job.git_url);
@@ -34,6 +35,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         //cleanup
         tester.clean().await?;
+        std::fs::remove_dir_all(format!("./{}", project_name));
     }
 
     Ok(())
